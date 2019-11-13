@@ -6,8 +6,9 @@ import loading from './loading.svg';
 import './App.css';
 import Sound from 'react-sound';
 import Button from './Button';
+import AlbumCover from './AlbumCover';
 
-const apiToken = 'BQBj8nzALqnYA3TJUIyKEln6O4O6xO3-GSoOPbjC8__UcNyece6mTjrKbEtVwrI7vP5dQelfcWJK6MjFi1OqfTpYjnLpTfsM_9NGYJHp0VIV8E3OkfD-PTNsQuWFcGYk2eLcZ4B1KsOhVrS2UmJdFI_cdhfrVoRHaH1TW6pfkw';
+const apiToken = 'BQC3TkIFJSHfVSgKkvN5wVVjNJPXfrhx-oePniCoaHGSFETXzIxvqu74QF1XjgtG7n3J_BIUDVtgMK8yP1_dTO86Jkl9dh_X9gPXhtAaTRv-AmnnLtETe7Sd8XO5b1DWoHUaYkXkI517QpLduMl0m5kmpxtIO2Gov_FdvUqWbw';
 
 function shuffleArray(array) {
   let counter = array.length;
@@ -34,7 +35,7 @@ class App extends Component {
     super();
     this.state = {
       text: "",
-      data: {},
+      tracks: {},
       songLoaded: false
     };
   }
@@ -51,11 +52,16 @@ class App extends Component {
     .then(response => response.json());
 
     console.log(res);
-    this.setState({ data: res, songLoaded: true });
+    this.setState({ tracks: res, songLoaded: true });
 
   }
 
   render() {
+    const currentTracks = this.state.tracks ? this.state.tracks.items : null;
+    const currentTrack = currentTracks && currentTracks[0] ? currentTracks[0].track : null;
+    const currentTrack1 = currentTracks && currentTracks[1] ? currentTracks[1].track : null;
+    const currentTrack2 = currentTracks && currentTracks[2] ? currentTracks[2].track : null;
+    const firstTracks = [currentTrack, currentTrack1, currentTrack2];
     return (
       <div className="App">
         <header className="App-header">
@@ -63,16 +69,23 @@ class App extends Component {
           <h1 className="App-title">Bienvenue sur le Blindtest</h1>
         </header>
         <div className="App-images">
-          {this.state.songLoaded ?
+          {this.state.songLoaded && currentTrack ?
           <div>
             <p>{this.state.text}</p>
-            <p>Nombre de musiques + {this.state.data.items.length}</p>
-            {this.state.data.items ? <p>Titre première chanson + {this.state.data.items[0].track.name}</p> : null}
+            <p>Nombre de musiques + {this.state.tracks.items.length}</p>
+            {this.state.tracks.items ? 
+              <div>
+                <p>Titre première chanson + {currentTrack.name}</p>
+                <AlbumCover track={currentTrack}/>
+                <Sound url={currentTrack.preview_url} playStatus={Sound.status.PLAYING}/>
+              </div>
+            : null}
           </div>
           : 
           <img src={loading} className="Logo-loarding" alt="loading"/>}
         </div>
         <div className="App-buttons">
+          {firstTracks.map(chanson => (chanson ? (<Button >{chanson.name}</Button>) : null))}
         </div>
       </div>
     );
